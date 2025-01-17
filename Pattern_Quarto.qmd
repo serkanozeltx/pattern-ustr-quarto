@@ -1,0 +1,135 @@
+---
+title: "Patterning Wright Map Analysis"
+---
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+```{---}
+title: "Wright Map Analysis for Multiple Datasets"
+author: "Blinded for Review"
+format: html
+---
+```
+
+```{r}
+
+# Load external R script
+source("wright_map_analysis.R")
+
+# Load required libraries
+library(readxl)
+
+# Load the custom function
+dataprepost <- read_excel("prepost.xlsx")
+
+# Subset data for group 1 (experimental)
+data_exp <- subset(dataprepost, Group == 1)
+
+# Subset data for group 0 (control)
+data_ctrl <- subset(dataprepost, Group == 0)
+
+# Subset data for age (4,5,6)
+data_age_4 <- subset(dataprepost, Age_Year == 4)
+data_age_5 <- subset(dataprepost, Age_Year == 5)
+data_age_6 <- subset(dataprepost, Age_Year == 6)
+
+# Define item parameters for analaysis
+item_columns_pre <- c("Item1", "Item2", "Item3", "Item4", "Item9", "Item10", "Item11", "Item12", "Item15", "Item16", "Item17", "Item18")
+item_columns_pre_id <- c("Item1", "Item2", "Item3", "Item4")
+item_columns_pre_extend <- c("Item9", "Item10", "Item11", "Item12")
+item_columns_pre_abstract <- c("Item15", "Item16", "Item17", "Item18")
+
+item_columns_post <- c("Item5", "Item6", "Item7", "Item8", "Item13", "Item14", "Item19", "Item20")
+item_columns_post_id <- c("Item5", "Item6", "Item7", "Item8")
+item_columns_post_extend <- c("Item13", "Item14")
+item_columns_post_abstract <- c("Item19", "Item20")
+
+item_columns_prepost <- c("Item1", "Item2", "Item3", "Item4", "Item5", "Item6", "Item7", "Item8", "Item9", "Item10", "Item11", "Item12", "Item13", "Item14", "Item15", "Item16", "Item17", "Item18", "Item19", "Item20")
+item_columns_prepost_id <- c("Item1", "Item2", "Item3", "Item4", "Item5", "Item6", "Item7", "Item8")
+item_columns_prepost_extend <- c("Item9", "Item10", "Item11", "Item12", "Item13", "Item14")
+item_columns_prepost_abstract <- c("Item15", "Item16", "Item17", "Item18", "Item19", "Item20")
+
+item_columns_prepost_none <- c("Item1", "Item4", "Item5", "Item8", "Item9", "Item10", "Item11", "Item12", "Item13", "Item14", "Item15", "Item16", "Item17", "Item18", "Item19", "Item20")
+item_columns_prepost_none_id <- c("Item1", "Item4", "Item5", "Item8")
+item_columns_prepost_none_extend <- c("Item9", "Item10", "Item11", "Item12", "Item13", "Item14")
+item_columns_prepost_none_abstract <- c("Item15", "Item16", "Item17", "Item18", "Item19", "Item20")
+
+# Define item names for showing on the map
+item_names_pre <- c("ID AABB", "ID NONE 1", "ID NONE 2", "ID ABB", "Ext AB", "Ext ABC", "Ext ABCD", "Ext AAB", "Abs AB", "Abs AAB", "Abs AABC", "Abs ABCD")
+
+item_names_post <- c("ID ABCD", "ID NONE 3", "ID NONE 4", "ID ABC", "Ext AABC", "Ext AABB", "Abs ABB", "Abs ABCC")
+
+item_names_prepost <- c("ID\nAABB", "ID\nNONE 1", "ID\nNONE 2", "ID\nABB", "ID\nABCD", "ID\nNONE 3", "ID\nNONE 4", "ID\nABC", "Ext\nAB", "Ext\nABC", "Ext\nABCD", "Ext\nAAB", "Ext\nAABC", "Ext\nAABB", "Abs\nAB", "Abs\nAAB", "Abs\nAABC", "Abs\nABCD", "Abs\nABB", "Abs\nABCC")
+
+item_names_prepost_none <- c("ID\nAABB", "ID\nABB", "ID\nABCD", "ID\nABC", "Extend\nAB", "Extend\nABC", "Extend\nABCD", "Extend\nAAB", "Extend\nAABC", "Extend\nAABB", "Abstract\nAB", "Abstract\nAAB", "Abstract\nAABC", "Abstract\nABCD", "Abstract\nABB", "Abstract\nABCC")
+
+# Create parameters for a dynamic title
+sample_info_pre <- "Intervention"
+sample_info_post <- "Post-Intervention"
+sample_info_prepost <- "Overall (Intervention and Post-Intervention)"
+group_info_exp <- "Experimental Group - Patterning Assessment Without Visual Cue"
+group_info_ctrl <- "Control Group - Patterning Assessment Without Visual Cue"
+group_info_cmbd_pre <- "Combined Groups - Patterning Assessment With/Without Visual Cue"
+group_info_cmbd_post <- "Combined Groups - Patterning Assessment Without Visual Cue"
+group_info_cmbd_prepost <- "Combined Groups - Patterning Assessment With/Without Visual Cue"
+group_info_cmbd_prepost_none <- "Combined Groups - Patterning Assessment With/Without Visual Cue (ID non-patterns items removed)"
+group_info_cmbd_prepost_none_4 <- "Combined Groups - Patterning Assessment With/Without Visual Cue (ID non-patterns items removed) - 4 Years"
+group_info_cmbd_prepost_none_5 <- "Combined Groups - Patterning Assessment With/Without Visual Cue (ID non-patterns items removed) - 5 Years"
+group_info_cmbd_prepost_none_6 <- "Combined Groups - Patterning Assessment With/Without Visual Cue (ID non-patterns items removed) - 6 Years"
+
+
+dim_labels <- c("Pattern ID", "Extend", "Abstract")
+label_colors <- c("red", "blue", "green")  # ID Pattern = red, Extend = blue, Abstract = green
+dim_colors_pre <- c(rep("red", 4), rep("blue", 4), rep("green", 4))
+dim_colors_post <- c(rep("red", 4), rep("blue", 2), rep("green", 2))
+dim_colors_prepost <- c(rep("red", 8), rep("blue", 6), rep("green", 6))
+dim_colors_prepost_none <- c(rep("red", 4), rep("blue", 6), rep("green", 6))
+
+
+item_shapes_pre <- c(rep(1, 4), rep(2, 4), rep(0, 4))
+item_shapes_post <- c(rep(1, 4), rep(2, 2), rep(0, 2))
+item_shapes_prepost <- c(rep(1, 8), rep(2, 6), rep(0, 6))
+item_shapes_prepost_none <- c(rep(1, 4), rep(2, 6), rep(0, 6))
+
+# Load Dataset 1 (Only intervention data) and run the analysis
+run_wright_map_analysis(dataprepost, item_columns_pre, dim_labels, label_colors, dim_colors_pre, output_file = "wright_map_dataset_pre.png", idpattern = item_columns_pre_id, extend = item_columns_pre_extend, abstract = item_columns_pre_abstract, sample_info = sample_info_pre, group_info = group_info_cmbd_pre, item_shapes = item_shapes_pre, item_names = item_names_pre)
+# Experimental Group
+run_wright_map_analysis(data_exp, item_columns_pre, dim_labels, label_colors, dim_colors_pre, output_file = "wright_map_dataset_pre_exp.png", idpattern = item_columns_pre_id, extend = item_columns_pre_extend, abstract = item_columns_pre_abstract, sample_info = sample_info_pre, group_info = group_info_exp, item_shapes = item_shapes_pre, item_names = item_names_pre)
+# Control Group
+run_wright_map_analysis(data_ctrl, item_columns_pre, dim_labels, label_colors, dim_colors_pre, output_file = "wright_map_dataset_pre_ctrl.png" , idpattern = item_columns_pre_id, extend = item_columns_pre_extend, abstract = item_columns_pre_abstract, sample_info = sample_info_pre, group_info = group_info_ctrl, item_shapes = item_shapes_pre, item_names = item_names_pre)
+
+# Load Dataset 2 (Only post-intervention data) and run the analysis
+run_wright_map_analysis(dataprepost, item_columns_post, dim_labels, label_colors, dim_colors_post, output_file = "wright_map_dataset_post.png", idpattern = item_columns_post_id, extend = item_columns_post_extend, abstract = item_columns_post_abstract, sample_info = sample_info_post, group_info = group_info_cmbd_post, item_shapes = item_shapes_post, item_names = item_names_post)
+# Experimental Group
+run_wright_map_analysis(data_exp, item_columns_post, dim_labels, label_colors, dim_colors_post, output_file = "wright_map_dataset_post_exp.png", idpattern = item_columns_post_id, extend = item_columns_post_extend, abstract = item_columns_post_abstract, sample_info = sample_info_post, group_info = group_info_exp, item_shapes = item_shapes_post, item_names = item_names_post)
+# Control Group
+run_wright_map_analysis(data_ctrl, item_columns_post, dim_labels, label_colors, dim_colors_post, output_file = "wright_map_dataset_post_ctrl.png", idpattern = item_columns_post_id, extend = item_columns_post_extend, abstract = item_columns_post_abstract, sample_info = sample_info_post, group_info = group_info_ctrl, item_shapes = item_shapes_post, item_names = item_names_post)
+
+# Load Dataset 3 (intervention and post-intervention data combined) and run the analysis
+run_wright_map_analysis(dataprepost, item_columns_prepost, dim_labels, label_colors, dim_colors_prepost, output_file = "wright_map_dataset_prepost.png", idpattern = item_columns_prepost_id, extend = item_columns_prepost_extend, abstract = item_columns_prepost_abstract, sample_info = sample_info_prepost, group_info = group_info_cmbd_prepost, item_shapes = item_shapes_prepost, item_names = item_names_prepost)
+# Experimental Group
+run_wright_map_analysis(data_exp, item_columns_prepost, dim_labels, label_colors, dim_colors_prepost, output_file = "wright_map_dataset_prepost_exp.png", idpattern = item_columns_prepost_id, extend = item_columns_prepost_extend, abstract = item_columns_prepost_abstract, sample_info = sample_info_prepost, group_info = group_info_exp, item_shapes = item_shapes_prepost, item_names = item_names_prepost)
+# Control Group
+run_wright_map_analysis(data_ctrl, item_columns_prepost, dim_labels, label_colors, dim_colors_prepost, output_file = "wright_map_dataset_prepost_ctrl.png", idpattern = item_columns_prepost_id, extend = item_columns_prepost_extend, abstract = item_columns_prepost_abstract, sample_info = sample_info_prepost, group_info = group_info_ctrl, item_shapes = item_shapes_prepost, item_names = item_names_prepost)
+
+# Load Dataset 4 (intervention and post-intervention data combined ID Pattern None's are removed) and run the analysis
+run_wright_map_analysis(dataprepost, item_columns_prepost_none, dim_labels, label_colors, dim_colors_prepost_none, output_file = "wright_map_dataset_prepost_none.png", idpattern = item_columns_prepost_none_id, extend = item_columns_prepost_none_extend, abstract = item_columns_prepost_none_abstract, sample_info = sample_info_prepost, group_info = group_info_cmbd_prepost, item_shapes = item_shapes_prepost_none, item_names = item_names_prepost_none)
+# Experimental Group
+run_wright_map_analysis(data_exp, item_columns_prepost_none, dim_labels, label_colors, dim_colors_prepost_none, output_file = "wright_map_dataset_prepost_none_exp.png", idpattern = item_columns_prepost_none_id, extend = item_columns_prepost_none_extend, abstract = item_columns_prepost_none_abstract, sample_info = sample_info_prepost, group_info = group_info_exp, item_shapes = item_shapes_prepost_none, item_names = item_names_prepost_none)
+# Control Group
+run_wright_map_analysis(data_ctrl, item_columns_prepost_none, dim_labels, label_colors, dim_colors_prepost_none, output_file = "wright_map_dataset_prepost_none_ctrl.png", idpattern = item_columns_prepost_none_id, extend = item_columns_prepost_none_extend, abstract = item_columns_prepost_none_abstract, sample_info = sample_info_prepost, group_info = group_info_ctrl, item_shapes = item_shapes_prepost_none, item_names = item_names_prepost_none)
+
+#4 Years
+run_wright_map_analysis(data_age_4, item_columns_prepost_none, dim_labels, label_colors, dim_colors_prepost_none, output_file = "wright_map_dataset_prepost_none_4.png", idpattern = item_columns_prepost_none_id, extend = item_columns_prepost_none_extend, abstract = item_columns_prepost_none_abstract, sample_info = sample_info_prepost, group_info = group_info_cmbd_prepost_none_4, item_shapes = item_shapes_prepost_none, item_names = item_names_prepost_none)
+
+#5 Years
+run_wright_map_analysis(data_age_5, item_columns_prepost_none, dim_labels, label_colors, dim_colors_prepost_none, output_file = "wright_map_dataset_prepost_none_5.png", idpattern = item_columns_prepost_none_id, extend = item_columns_prepost_none_extend, abstract = item_columns_prepost_none_abstract, sample_info = sample_info_prepost, group_info = group_info_cmbd_prepost_none_5, item_shapes = item_shapes_prepost_none, item_names = item_names_prepost_none)
+
+#6 Years
+run_wright_map_analysis(data_age_6, item_columns_prepost_none, dim_labels, label_colors, dim_colors_prepost_none, output_file = "wright_map_dataset_prepost_none_6.png", idpattern = item_columns_prepost_none_id, extend = item_columns_prepost_none_extend, abstract = item_columns_prepost_none_abstract, sample_info = sample_info_prepost, group_info = group_info_cmbd_prepost_none_6, item_shapes = item_shapes_prepost_none, item_names = item_names_prepost_none)
+
+```
+
+\`\`\`
